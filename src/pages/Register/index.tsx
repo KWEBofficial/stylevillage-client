@@ -31,6 +31,10 @@ export function RegisterPage() {
         enqueueSnackbar('비밀번호가 일치하지 않습니다.', { variant: 'error' });
         return;
       }
+      if (Object.values(values).some((value) => !value)) {
+        enqueueSnackbar('모든 정보를 입력해 주세요.');
+        return;
+      }
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, values);
       if (response.status === 200) {
         enqueueSnackbar('회원가입에 성공하셨습니다.', { variant: 'success' });

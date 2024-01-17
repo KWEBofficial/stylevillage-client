@@ -1,11 +1,40 @@
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 
+import { ProfilePage } from '../Profile';
+
+// import MyWishesPage from './myWishes';
+// import MyLendsPage from './myLends';
+// import MyClosetsPage from './myClosets';
+// import MyApplysPage from './myApplys';
+
+type PageType = 'profile' | 'closets' | 'applies' | 'lends' | 'wishes';
+
 export default function MyPage() {
-  const userNickname = sessionStorage.getItem('userNickname');
-  const navigate = useNavigate();
-  const handleNavClick = (path: string) => {
-    navigate(path);
+  const [currentPage, setCurrentPage] = useState<PageType | null>(null);
+  const nickname = sessionStorage.getItem('userNickname');
+
+  const handleButtonClick = (page: PageType) => {
+    setCurrentPage(page);
+  };
+
+  const renderPage = () => {
+    if (currentPage === 'profile') {
+      return <ProfilePage />;
+    }
+    // if (currentPage === 'closets') {
+    //   return <MyClosetsPage />;
+    // }
+    // if (currentPage === 'applies') {
+    //   return <MyApplysPage />;
+    // }
+    // if (currentPage === 'lends') {
+    //   return <MyLendsPage />;
+    // }
+    // if (currentPage === 'wishes') {
+    //   return <MyWishesPage />;
+    // }
+    return null;
   };
 
   return (
@@ -17,74 +46,70 @@ export default function MyPage() {
               마이페이지
             </Typography>
             <Button
+              onClick={() => handleButtonClick('profile')}
               sx={{
                 mt: 3,
                 color: 'black',
                 fontSize: 15,
               }}
-              onClick={() => handleNavClick('/profile')}
             >
               내 정보 수정하기
             </Button>
           </Box>
           <Typography variant="body1" sx={{ ml: 12, fontweight: 'bold' }}>
-            {userNickname}님의 대여 내역을 확인할 수 있습니다.
+            {nickname}님의 대여 내역을 확인할 수 있습니다.
           </Typography>
           <Box sx={{ mt: 8, textAlign: 'center' }}>
             <Button
+              onClick={() => handleButtonClick('closets')}
               sx={{
                 mb: 2,
-                mr: 8,
+                mr: 17,
                 color: 'black',
                 fontSize: 25,
                 fontWeight: 'bold',
               }}
-              onClick={() => handleNavClick('/mycloset')}
             >
               내 옷장
             </Button>
             <Button
+              onClick={() => handleButtonClick('applies')}
               sx={{
                 mb: 2,
-                mr: 8,
+                mr: 17,
                 color: 'black',
                 fontSize: 25,
                 fontWeight: 'bold',
               }}
-              onClick={() => handleNavClick('/myapplys')}
             >
               대여 신청 내역
             </Button>
             <Button
+              onClick={() => handleButtonClick('lends')}
               sx={{
                 mb: 2,
-                mr: 8,
+                mr: 17,
                 color: 'black',
                 fontSize: 25,
                 fontWeight: 'bold',
               }}
-              onClick={() => handleNavClick('/mylends')}
             >
               대여 내역
             </Button>
             <Button
+              onClick={() => handleButtonClick('wishes')}
               sx={{
                 mb: 2,
                 color: 'black',
                 fontSize: 25,
                 fontWeight: 'bold',
               }}
-              onClick={() => handleNavClick('/mywishes')}
             >
               찜한 옷
             </Button>
           </Box>
         </Box>
-        <Box sx={{ width: '100%', height: '100%', bgcolor: 'white', padding: 2 }}>
-          <Typography variant="h3" sx={{ p: 2, fontWeight: 'bold' }}>
-            마이페이지
-          </Typography>
-        </Box>
+        {renderPage()}
       </Box>
     </>
   );

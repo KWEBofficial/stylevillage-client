@@ -1,19 +1,19 @@
 import { Box, Typography } from '@mui/material';
 
 import Chip from '../Chip';
-import { Item } from '../../models/item';
+import { GroupItem } from '../../models/item';
 
 interface CategoryChipsProps {
-  handleCategoryChipsClick: (category: string, label: string, isSelected: boolean) => void;
-  category: string;
-  items: Item[];
+  // handleGroupClick: (group: string, label: string, isSelected: boolean) => void; // 아이템 별 isselected 정보를 바꿔주는?
+  group: string;
+  items: GroupItem[];
 }
 
 export default function CategoryChips(props: CategoryChipsProps) {
-  const { category, items } = props;
-  const handleChipClick = (label: string, isSelected: boolean) => {
-    props.handleCategoryChipsClick(category, label, isSelected);
-  };
+  const { group, items } = props;
+  // const handleClick = (label: string, isSelected: boolean) => {
+  //   props.handlegroupClick(category, label, isSelected);
+  // };
   return (
     <Box
       display={'flex'}
@@ -26,10 +26,10 @@ export default function CategoryChips(props: CategoryChipsProps) {
       }}
     >
       <Typography variant="h6" sx={{ width: '70px', mr: 1.5, fontSize: 17, fontWeight: 'bold' }}>
-        {category}
+        {group}
       </Typography>
       {items.map((item, index) => (
-        <Chip key={index} handleChipClick={handleChipClick} item={item} />
+        <Chip key={index} handleClick={item.handleClick} label={item.label} />
       ))}
     </Box>
   );

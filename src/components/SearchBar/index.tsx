@@ -4,7 +4,7 @@ import { Box, IconButton, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 import CategoryChips from '../CategoryChips';
-import { Item } from '../../models/item';
+import { GroupItem } from '../../models/item';
 import { Categories, Seasons, Status } from '../../data/enumLists';
 
 interface SearchBarProps {
@@ -22,25 +22,51 @@ export default function SearchBar(props: SearchBarProps) {
   const [seasonSelected, setSeasonSelected] = useState(props.seasonSelected);
   const [filterSelected, setFilterSelected] = useState(props.filterSelected);
 
+  // 일단 적어보기
+  const makeHandleChipItem = (group: string, itemList: string[]): GroupItem[] => {
+    let setGroupSelected = setCategorySelected;
+    if (group === '계절') setGroupSelected = setSeasonSelected;
+    if (group === '필터') setGroupSelected = setFilterSelected;
+    let groupSelected: string[] = categorySelected;
+    if (group === '계절') groupSelected = seasonSelected;
+    if (group === '필터') groupSelected = filterSelected;
+    return itemList.map((item: string) => {
+      const handleClick: () => void = () =>
+        setGroupSelected(
+          groupSelected.includes(item) ? [...groupSelected, item] : groupSelected.filter((g) => g !== item),
+        );
+      const groupItem: GroupItem = {
+        label: item,
+        handleClick,
+      };
+      return groupItem;
+    });
+  };
+
+  const handleCategory = makeHandleChipItem('카테고리', Categories);
+  const handleSeason = makeHandleChipItem('계절', Seasons);
+  const handleFilter = makeHandleChipItem('필터', Status);
+  // 여기까지 적어보기
+
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     setSearchKeyWord(event.target.value);
   };
 
-  const handleChipState = (category: string, label: string, isSelected: boolean) => {
-    switch (category) {
-      case '카테고리':
-        setCategorySelected(isSelected ? [...categorySelected, label] : categorySelected.filter((c) => c !== label));
-        break;
-      case '계절':
-        setSeasonSelected(isSelected ? [...seasonSelected, label] : seasonSelected.filter((c) => c !== label));
-        break;
-      case '필터':
-        setFilterSelected(isSelected ? [...filterSelected, label] : filterSelected.filter((c) => c !== label));
-        break;
-      default:
-        break;
-    }
-  };
+  // const handleChipState = (category: string, label: string, isSelected: boolean) => {
+  //   switch (category) {
+  //     case '카테고리':
+  //       setCategorySelected(isSelected ? [...categorySelected, label] : categorySelected.filter((c) => c !== label));
+  //       break;
+  //     case '계절':
+  //       setSeasonSelected(isSelected ? [...seasonSelected, label] : seasonSelected.filter((c) => c !== label));
+  //       break;
+  //     case '필터':
+  //       setFilterSelected(isSelected ? [...filterSelected, label] : filterSelected.filter((c) => c !== label));
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -57,30 +83,30 @@ export default function SearchBar(props: SearchBarProps) {
     navigate(url);
   };
 
-  const initCategories = Categories.map((value) => {
-    if (props.categorySelected.includes(value)) {
-      const item: Item = { label: value, isSelected: true };
-      return item;
-    }
-    const item: Item = { label: value, isSelected: false };
-    return item;
-  });
-  const initSeasons = Seasons.map((value) => {
-    if (props.seasonSelected.includes(value)) {
-      const item: Item = { label: value, isSelected: true };
-      return item;
-    }
-    const item: Item = { label: value, isSelected: false };
-    return item;
-  });
-  const initFilter = Status.map((value) => {
-    if (props.filterSelected.includes(value)) {
-      const item: Item = { label: value, isSelected: true };
-      return item;
-    }
-    const item: Item = { label: value, isSelected: false };
-    return item;
-  });
+  // const initCategories = Categories.map((value) => {
+  //   if (props.categorySelected.includes(value)) {
+  //     const item: Item = { label: value, isSelected: true };
+  //     return item;
+  //   }
+  //   const item: Item = { label: value, isSelected: false };
+  //   return item;
+  // });
+  // const initSeasons = Seasons.map((value) => {
+  //   if (props.seasonSelected.includes(value)) {
+  //     const item: Item = { label: value, isSelected: true };
+  //     return item;
+  //   }
+  //   const item: Item = { label: value, isSelected: false };
+  //   return item;
+  // });
+  // const initFilter = Status.map((value) => {
+  //   if (props.filterSelected.includes(value)) {
+  //     const item: Item = { label: value, isSelected: true };
+  //     return item;
+  //   }
+  //   const item: Item = { label: value, isSelected: false };
+  //   return item;
+  // });
 
   return (
     <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
@@ -134,9 +160,9 @@ export default function SearchBar(props: SearchBarProps) {
           '& .MuiTextField-root': { margin: 1 },
         }}
       >
-        <CategoryChips handleCategoryChipsClick={handleChipState} category="카테고리" items={initCategories} />
-        <CategoryChips handleCategoryChipsClick={handleChipState} category="계절" items={initSeasons} />
-        <CategoryChips handleCategoryChipsClick={handleChipState} category="필터" items={initFilter} />
+        <CategoryChips items={handleCategory} group="카테고리" />
+        <CategoryChips items={handleSeason} group="계절" />
+        <CategoryChips items={handleFilter} group="필터" />
       </Box>
     </Box>
   );

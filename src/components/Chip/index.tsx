@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { Button } from '@mui/material';
 
-import { Item } from '../../models/item';
-
 interface ChipProps {
-  handleChipClick: (label: string, isSelected: boolean) => void;
-  item: Item;
+  handleClick: () => void;
+  label: string;
+  // isSelected: boolean;
 }
 export default function Chip(props: ChipProps) {
-  const { item } = props;
-  const [isSelected, setisSelected] = useState(item.isSelected);
+  const { label } = props;
+  const [isSelected, setisSelected] = useState(false);
   const handleClick = () => {
     setisSelected(!isSelected);
-    props.handleChipClick(item.label, !isSelected);
+    props.handleClick();
   };
   return (
     <Button
@@ -29,7 +28,7 @@ export default function Chip(props: ChipProps) {
         borderRadius: 100,
       }}
     >
-      {item.label}
+      {label}
     </Button>
   );
 }

@@ -49,7 +49,7 @@ export function SearchPage() {
   };
   useEffect(() => {
     getSearch();
-  }, []);
+  }, [searchKeyWord, categorySelected, seasonSelected, filterSelected]);
   useEffect(() => {
     setSearchedClothes(apiCallResult?.clothes ?? emptySearchArray);
   }, [apiCallResult]);

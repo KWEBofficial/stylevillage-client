@@ -8,7 +8,7 @@ interface Owner {
   nickname?: string;
   location?: string;
 }
-interface SearchClothesRes {
+export interface SearchClothesRes {
   id: number;
   closetId: number;
   category?: string;
@@ -21,7 +21,7 @@ interface SearchClothesRes {
   owner: Owner;
   isWished: boolean;
 }
-interface SearchRes {
+export interface SearchRes {
   clothes: SearchClothesRes[];
 }
 

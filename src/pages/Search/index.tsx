@@ -2,7 +2,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 
-import { getSearchAPICall } from '../../hooks/api/search/search';
+import { SearchRes, getSearchAPICall } from '../../hooks/api/search/search';
 import SearchBar from '../../components/SearchBar';
 import ClothesPreviewCard from '../../components/ClothesPreviewCard';
 
@@ -37,12 +37,12 @@ export function SearchPage() {
   const filterSelected = searchParams.getAll('status');
 
   const emptySearchArray: SearchClothesRes[] = [];
+  const [apiCallResult, setApiCallResult] = useState<SearchRes | undefined>();
   const [searchedClothes, setSearchedClothes] = useState(emptySearchArray);
   const getSearch = async () => {
     try {
       const result = await getSearchAPICall(url);
-      if (result) setSearchedClothes(result.clothes);
-      else setSearchedClothes(emptySearchArray);
+      setApiCallResult(result);
     } catch (error) {
       //
     }
@@ -50,6 +50,9 @@ export function SearchPage() {
   useEffect(() => {
     getSearch();
   }, []);
+  useEffect(() => {
+    setSearchedClothes(apiCallResult?.clothes ?? emptySearchArray);
+  }, [apiCallResult]);
 
   const clothesCards = searchedClothes
     ? searchedClothes.map((clothes: SearchClothesRes) => {

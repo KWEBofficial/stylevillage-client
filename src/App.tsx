@@ -1,4 +1,8 @@
+import { RecoilRoot } from 'recoil';
 import { BrowserRouter } from 'react-router-dom';
+import { SnackbarProvider } from 'notistack';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { ThemeProvider, createTheme } from '@mui/material';
 
 import { RouteComponent } from './route';
@@ -25,11 +29,17 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Layout>
-          <RouteComponent />
-        </Layout>
-      </BrowserRouter>
+      <RecoilRoot>
+        <BrowserRouter>
+          <Layout>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <SnackbarProvider autoHideDuration={2000}>
+                <RouteComponent />
+              </SnackbarProvider>
+            </LocalizationProvider>
+          </Layout>
+        </BrowserRouter>
+      </RecoilRoot>
     </ThemeProvider>
   );
 }

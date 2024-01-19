@@ -21,14 +21,11 @@ export interface SearchClothesRes {
   owner: Owner;
   isWished: boolean;
 }
-export interface SearchRes {
-  clothes: SearchClothesRes[];
-}
 
 // eslint-disable-next-line consistent-return
 export async function getSearchAPICall(url: string) {
   try {
-    const response = await axios.get<SearchRes>(`${process.env.REACT_APP_API_URL}${url}`);
+    const response = await axios.get<SearchClothesRes[]>(`${process.env.REACT_APP_API_URL}${url}`);
     if (response.status === 200) {
       return response.data;
     }

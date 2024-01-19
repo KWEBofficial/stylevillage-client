@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Button } from '@mui/material';
 
 interface ChipProps {
-  handleClick: () => void;
+  handleClick: (e: React.FormEventHandler<HTMLFormElement>, a: string, b: string[]) => void;
   label: string;
-  // isSelected: boolean;
 }
 export default function Chip(props: ChipProps) {
   const { label } = props;

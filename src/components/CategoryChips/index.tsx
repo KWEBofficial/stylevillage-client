@@ -4,16 +4,14 @@ import Chip from '../Chip';
 import { GroupItem } from '../../models/item';
 
 interface CategoryChipsProps {
-  // handleGroupClick: (group: string, label: string, isSelected: boolean) => void; // 아이템 별 isselected 정보를 바꿔주는?
+  handleGroupClick: (e: React.FormEventHandler<HTMLFormElement>, a: string, b: string[]) => void;
   group: string;
-  items: GroupItem[];
+  items: string[];
+  selected: string[];
 }
 
 export default function CategoryChips(props: CategoryChipsProps) {
-  const { group, items } = props;
-  // const handleClick = (label: string, isSelected: boolean) => {
-  //   props.handlegroupClick(category, label, isSelected);
-  // };
+  const { group, items, handleGroupClick, selected } = props;
   return (
     <Box
       display={'flex'}
@@ -29,7 +27,7 @@ export default function CategoryChips(props: CategoryChipsProps) {
         {group}
       </Typography>
       {items.map((item, index) => (
-        <Chip key={index} handleClick={item.handleClick} label={item.label} />
+        <Chip key={index} handleClick={handleGroupClick(group, item)} label={item} selected={selected} />
       ))}
     </Box>
   );

@@ -1,8 +1,8 @@
-import { useLocation, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Box } from '@mui/material';
 
-import { SearchRes, getSearchAPICall } from '../../hooks/api/search/search';
+import { getSearchAPICall } from '../../hooks/api/search/search';
 import SearchBar from '../../components/SearchBar';
 import ClothesPreviewCard from '../../components/ClothesPreviewCard';
 
@@ -26,61 +26,102 @@ interface SearchClothesRes {
 }
 
 export function SearchPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const location = useLocation();
-  const queryString = location.search;
-  const url = `/search${queryString}`;
+  const defaultSearchKeyWord = searchParams.get('text') || '';
+  const defaultCategorySelected = searchParams.getAll('category');
+  const defaultSeasonSelected = searchParams.getAll('season');
+  const defaultFilterSelected = searchParams.getAll('status');
+  const [searchKeyWord, setSearchKeyWord] = useState(defaultSearchKeyWord);
+  const [categorySelected, setCategorySelected] = useState(defaultCategorySelected);
+  const [seasonSelected, setSeasonSelected] = useState(defaultSeasonSelected);
+  const [filterSelected, setFilterSelected] = useState(defaultFilterSelected);
+  const [queryString, setQueryString] = useState<string>();
+  const [searchBar, setSearchBar] = useState<string>();
 
-  const searchKeyWord = searchParams.get('text') || '';
-  const categorySelected = searchParams.getAll('category');
-  const seasonSelected = searchParams.getAll('season');
-  const filterSelected = searchParams.getAll('status');
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    setSearchBar(event.target.value);
+  };
 
-  const emptySearchArray: SearchClothesRes[] = [];
-  const [apiCallResult, setApiCallResult] = useState<SearchRes | undefined>();
-  const [searchedClothes, setSearchedClothes] = useState(emptySearchArray);
-  const getSearch = async () => {
-    try {
-      const result = await getSearchAPICall(url);
-      setApiCallResult(result);
-    } catch (error) {
-      //
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    setSearchKeyWord(searchBar || '');
+
+    // 쿼리 만들기
+    const keyWordQueryString = `text=${encodeURIComponent(searchKeyWord)}`;
+    const categoryQueryString = categorySelected
+      .map((category) => `category=${encodeURIComponent(category)}`)
+      .join('&');
+    const seasonQueryString = seasonSelected.map((season) => `season=${encodeURIComponent(season)}`).join('&');
+    const filterQueryString = filterSelected.map((filter) => `filter=${encodeURIComponent(filter)}`).join('&');
+
+    const newQueryString = [keyWordQueryString, categoryQueryString, seasonQueryString, filterQueryString]
+      .filter((query) => !!query)
+      .join('&');
+    setQueryString(newQueryString);
+
+    const url = `/search?${queryString}`;
+    navigate(url);
+  };
+
+  const handleGroupClick = (group: string, label: string) => {
+    switch (group) {
+      case '카테고리':
+        setCategorySelected(
+          categorySelected.includes(label) ? [...categorySelected, label] : categorySelected.filter((c) => c !== label),
+        );
+        break;
+      case '계절':
+        setSeasonSelected(
+          seasonSelected.includes(label) ? [...seasonSelected, label] : seasonSelected.filter((c) => c !== label),
+        );
+        break;
+      case '필터':
+        setFilterSelected(
+          filterSelected.includes(label) ? [...filterSelected, label] : filterSelected.filter((c) => c !== label),
+        );
+        break;
+      default:
+        break;
     }
   };
-  useEffect(() => {
-    getSearch();
-  }, [searchKeyWord, categorySelected, seasonSelected, filterSelected]);
-  useEffect(() => {
-    setSearchedClothes(apiCallResult?.clothes ?? emptySearchArray);
-  }, [apiCallResult]);
 
-  const clothesCards = searchedClothes
-    ? searchedClothes.map((clothes: SearchClothesRes) => {
-        const { id, name, status, owner, isWished } = clothes;
-        return (
-          <ClothesPreviewCard
-            key={id}
-            clothesId={id}
-            clothesname={name}
-            imgsrc={''}
-            status={status}
-            userid={owner.id || 0}
-            username={'닉네임'}
-            isWished={isWished}
-          />
-        );
-      })
-    : [];
-  console.log(searchedClothes);
-  console.log(clothesCards);
+  const getCards = (clothesList: SearchClothesRes[]) => {
+    return clothesList
+      ? clothesList.map((clothes: SearchClothesRes) => {
+          const { id, name, status, owner, isWished } = clothes;
+          return (
+            <ClothesPreviewCard
+              key={id}
+              clothesId={id}
+              clothesname={name}
+              imgsrc={}
+              status={status}
+              userid={owner.id || 0}
+              username={owner.nickname || owner.username}
+              isWished={isWished}
+            />
+          );
+        })
+      : [];
+  };
+  const clothesCards = getSearchAPICall(searchKeyWord)
+    .then((result) => {
+      return getCards(result || []);
+    })
+    .catch();
+
   return (
     <>
       <Box sx={{ paddingTop: '24px', backgroundColor: '#E9E9E9' }}>
         <SearchBar
-          searchKeyWord={searchKeyWord}
-          categorySelected={categorySelected}
-          seasonSelected={seasonSelected}
-          filterSelected={filterSelected}
+          defaultSearchKeyWord={defaultSearchKeyWord}
+          defaultcategorySelected={defaultCategorySelected}
+          defaultseasonSelected={defaultSeasonSelected}
+          defaultfilterSelected={defaultFilterSelected}
+          handleSubmit={handleSubmit}
+          handleGroupClick={handleGroupClick}
+          handleChange={handleChange}
         />
       </Box>
       {clothesCards}
